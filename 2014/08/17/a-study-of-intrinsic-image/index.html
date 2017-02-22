@@ -9,8 +9,7 @@
     
     <meta name="author" content="soundsilencebisai">
     
-    <meta name="description" content="###Derive Intrinsic Images from Image Sequences (ICCV 2001)
-
+    <meta name="description" content="Derive Intrinsic Images from Image Sequences (ICCV 2001)
 Assumption: when derivative filters are applied to natural images, the filter output tend to be sparse.
 Multiple images from a video: same reflectance image, different illumination
 $I = R \times L \xrightarrow{\text{log}} i = r + l   \xrightarrow{\text{apply filter } f_n} o_n = r_n + l_n$ 
@@ -40,7 +39,7 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 				<h1 class="site-name"><a href="/" title="醉飲春醪">醉飲春醪</a></h1>
 				<h2 class="blog-motto">在這急景流年的人生裏，我願高舉這盛到杯緣的春醪暢飲</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -76,15 +75,14 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 		<a href="http://soundsilence.github.io/about" title="soundsilencebisai" target="_blank" itemprop="author">soundsilencebisai</a>
 		
   <p class="article-time">
-    <time datetime="2014-08-18T00:29:39.000Z" itemprop="datePublished"> Published Aug 17 2014</time>
+    <time datetime="2014-08-18T00:29:39.000Z" itemprop="datePublished"> 发表于 Aug 17 2014</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
 		
-		<p>###Derive Intrinsic Images from Image Sequences (ICCV 2001)</p>
-<ul>
+		<h3 id="Derive-Intrinsic-Images-from-Image-Sequences-ICCV-2001"><a href="#Derive-Intrinsic-Images-from-Image-Sequences-ICCV-2001" class="headerlink" title="Derive Intrinsic Images from Image Sequences (ICCV 2001)"></a>Derive Intrinsic Images from Image Sequences (ICCV 2001)</h3><ul>
 <li>Assumption: when derivative filters are applied to natural images, the filter output tend to be sparse.</li>
 <li>Multiple images from a video: same reflectance image, different illumination</li>
 <li>$I = R \times L \xrightarrow{\text{log}} i = r + l   \xrightarrow{\text{apply filter } f_n} o_n = r_n + l_n$ </li>
@@ -92,8 +90,7 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 <li>Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$</li>
 </ul>
 <a id="more"></a>
-<p>###Intrinsic Images Decomposition Using a Local and Global Sparse Representation of Reflectance (CVPR 2011)</p>
-<ul>
+<h3 id="Intrinsic-Images-Decomposition-Using-a-Local-and-Global-Sparse-Representation-of-Reflectance-CVPR-2011"><a href="#Intrinsic-Images-Decomposition-Using-a-Local-and-Global-Sparse-Representation-of-Reflectance-CVPR-2011" class="headerlink" title="Intrinsic Images Decomposition Using a Local and Global Sparse Representation of Reflectance (CVPR 2011)"></a>Intrinsic Images Decomposition Using a Local and Global Sparse Representation of Reflectance (CVPR 2011)</h3><ul>
 <li>Assumption: neighboring pixels usually have the same reflectance if their chromaticities are the same or very similar. </li>
 <li>Use the assumption to restrict the reflectance of <em>similar pixels</em></li>
 <li>Constraints on pixels:<ul>
@@ -104,22 +101,19 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 </li>
 <li>Minimization energy function</li>
 </ul>
-<p>###Intrinsic Image Decomposition with Non-local Texture Cues (CVPR 2008)</p>
-<ul>
+<h3 id="Intrinsic-Image-Decomposition-with-Non-local-Texture-Cues-CVPR-2008"><a href="#Intrinsic-Image-Decomposition-with-Non-local-Texture-Cues-CVPR-2008" class="headerlink" title="Intrinsic Image Decomposition with Non-local Texture Cues (CVPR 2008)"></a>Intrinsic Image Decomposition with Non-local Texture Cues (CVPR 2008)</h3><ul>
 <li>Assumption: distinct points with the same intensity-normalized texture configuration generally have the same reflectance value.</li>
 <li>Intensity-normalized texture: use the neighbour pixels’ intensity-normalized color values(chromaticity) to represent texture information</li>
 <li>Divide pixels into different groups: pixels in the same group have the same reflectance</li>
 <li>Minimization: weighted refletance difference of neighbours &amp; shading derivatives</li>
 </ul>
-<p>###Intrinsic Images Using Optimization (CVPR 2011)</p>
-<ul>
+<h3 id="Intrinsic-Images-Using-Optimization-CVPR-2011"><a href="#Intrinsic-Images-Using-Optimization-CVPR-2011" class="headerlink" title="Intrinsic Images Using Optimization (CVPR 2011)"></a>Intrinsic Images Using Optimization (CVPR 2011)</h3><ul>
 <li>Assumption: neighboring pixels in a local window of a single image having similar intensity values should have similar reflectance values.</li>
 <li>Each pixel’s reflectance value is a weighted sum of its neighbours’ reflectance values: $R_i = \sum_{j \in N(i)} w_{ij} R_j$</li>
 <li>Energy function: $E(R,s) = \sum_{i \in p} (R_i - \sum_{j \in N(i)} w_{ij} R_j )^2 + \sum_{i \in p}(I_i / s_i - R_i)^2$</li>
 <li>Minimize energy function</li>
 </ul>
-<p>###Intrinsic Images by Clustering (CGF 2012)</p>
-<ul>
+<h3 id="Intrinsic-Images-by-Clustering-CGF-2012"><a href="#Intrinsic-Images-by-Clustering-CGF-2012" class="headerlink" title="Intrinsic Images by Clustering (CGF 2012)"></a>Intrinsic Images by Clustering (CGF 2012)</h3><ul>
 <li>Assumption: regions of similar chromaticity in the input image have the same reflectance</li>
 <li>Segment input images according to chromaticity $\rightarrow$ subdivide the segment into clusters $\rightarrow$ refine clusters </li>
 <li>Segment: CIElab color space, feature $(\beta,a,b)$, k-means</li>
@@ -132,8 +126,7 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 </li>
 <li>Solve linear system</li>
 </ul>
-<p>###Intrinsic Images in the Wild (SIGGRAPH 2014)</p>
-<ul>
+<h3 id="Intrinsic-Images-in-the-Wild-SIGGRAPH-2014"><a href="#Intrinsic-Images-in-the-Wild-SIGGRAPH-2014" class="headerlink" title="Intrinsic Images in the Wild (SIGGRAPH 2014)"></a>Intrinsic Images in the Wild (SIGGRAPH 2014)</h3><ul>
 <li>Assumption: shading smoothness, reflectance sparseness</li>
 <li>Energy function: $E(x) = w_p E_p(x) + w_s E_s(x) + w_l E_l(x) $<ul>
 <li>$E_p$: constrain reflectance, encourage pixels with the similar <em>positions, intensity, chromaticity</em> should have similar reflectance.</li>
@@ -143,8 +136,7 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 </li>
 <li>Judgement: WHDR, compare human judgement and algorithm output</li>
 </ul>
-<p>###Intrinsic Video and Applications (SIGGRAPH 2014)</p>
-<ul>
+<h3 id="Intrinsic-Video-and-Applications-SIGGRAPH-2014"><a href="#Intrinsic-Video-and-Applications-SIGGRAPH-2014" class="headerlink" title="Intrinsic Video and Applications (SIGGRAPH 2014)"></a>Intrinsic Video and Applications (SIGGRAPH 2014)</h3><ul>
 <li>Initial decomposition for the first frame: cluster based </li>
 <li>Propagation: for the next frame, for each pixel, find the cluster that it belongs in the previous frame. <ul>
 <li>Determine cluster index through <em>Maximium A Posterior (MAP)</em></li>
@@ -156,8 +148,7 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 <li>Backward propagation</li>
 <li>Coarse-to-fine: determine unassigned pixel values through <em>Possion Blending</em></li>
 </ul>
-<p>###Estimating Intrinsic Component Images using Non-Linear Regression (CVPR 2006)</p>
-<ul>
+<h3 id="Estimating-Intrinsic-Component-Images-using-Non-Linear-Regression-CVPR-2006"><a href="#Estimating-Intrinsic-Component-Images-using-Non-Linear-Regression-CVPR-2006" class="headerlink" title="Estimating Intrinsic Component Images using Non-Linear Regression (CVPR 2006)"></a>Estimating Intrinsic Component Images using Non-Linear Regression (CVPR 2006)</h3><ul>
 <li>Different from other approaches which focus on reflectance images, this method focuses on recovering shading image first. </li>
 <li>Non-linear regression: the intrinsic component $c$ of a pixel is evaluated as $r(o)$<ul>
 <li>$o$ is a feature vector generated from a patch of the image</li>
@@ -167,8 +158,7 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 </li>
 <li>We can have multiple $r$ with different weights, which could also be learnt.</li>
 </ul>
-<p>###User-Assisted Intrinsic Images (SIGGRAPH Asia 2009)</p>
-<ul>
+<h3 id="User-Assisted-Intrinsic-Images-SIGGRAPH-Asia-2009"><a href="#User-Assisted-Intrinsic-Images-SIGGRAPH-Asia-2009" class="headerlink" title="User-Assisted Intrinsic Images (SIGGRAPH Asia 2009)"></a>User-Assisted Intrinsic Images (SIGGRAPH Asia 2009)</h3><ul>
 <li>Assumption: reflectance variations lie locally in a plane in color space, pixels in planes parallel to the reflectance have constant illumination. </li>
 <li>There exist $3D$ vector $\mathbf{a}$ such that that $\mathbf{a * R} = 1 \rightarrow \mathbf{a * I = s} $   </li>
 <li>Minimize energy function $\sum(s - \mathbf{a*I})$<ul>
@@ -182,8 +172,7 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 </ul>
 </li>
 </ul>
-<p>###Color Constancy, Intrinsic Images, and Shape Estimation (ECCV 2012)</p>
-<ul>
+<h3 id="Color-Constancy-Intrinsic-Images-and-Shape-Estimation-ECCV-2012"><a href="#Color-Constancy-Intrinsic-Images-and-Shape-Estimation-ECCV-2012" class="headerlink" title="Color Constancy, Intrinsic Images, and Shape Estimation (ECCV 2012)"></a>Color Constancy, Intrinsic Images, and Shape Estimation (ECCV 2012)</h3><ul>
 <li>A unified approach for solving three problems</li>
 <li>Problem formulation:  $\text{minimize}_{(Z,R,L)} g(R) + f(Z) + h(L)$, subject to $I = R + S(Z,L)$<ul>
 <li>R: log-reflectance map</li>
@@ -204,15 +193,12 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 </ul>
 </li>
 </ul>
-<p>##Summary</p>
-<p>###Priors</p>
-<ul>
+<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><h3 id="Priors"><a href="#Priors" class="headerlink" title="Priors"></a>Priors</h3><ul>
 <li>Shading smoothness</li>
 <li>Reflectance sparseness and piecewise constant</li>
 <li>Texture indicators: same texture, same reflectance</li>
 </ul>
-<p>###Methods</p>
-<ul>
+<h3 id="Methods"><a href="#Methods" class="headerlink" title="Methods"></a>Methods</h3><ul>
 <li>Optimization</li>
 <li>Propagation</li>
 <li>Probability inference</li>
@@ -286,15 +272,15 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 </section>
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
 			<li><a href="/categories/Leetcode/" title="Leetcode">Leetcode<sup>4</sup></a></li>
@@ -311,20 +297,20 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 
   
 <div class="tagslist">
-	<p class="asidetitle">Tags</p>
+	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
 			<li><a href="/tags/code/" title="code">code<sup>4</sup></a></li>
 		
 			<li><a href="/tags/paper/" title="paper">paper<sup>3</sup></a></li>
 		
+			<li><a href="/tags/programming/" title="programming">programming<sup>2</sup></a></li>
+		
 			<li><a href="/tags/computer-vision/" title="computer vision">computer vision<sup>2</sup></a></li>
 		
 			<li><a href="/tags/signal-processing/" title="signal processing">signal processing<sup>2</sup></a></li>
 		
 			<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
-		
-			<li><a href="/tags/programming/" title="programming">programming<sup>2</sup></a></li>
 		
 			<li><a href="/tags/Intrinsic-Image/" title="Intrinsic Image">Intrinsic Image<sup>1</sup></a></li>
 		
@@ -339,7 +325,7 @@ Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
 
 
   <div class="rsspart">
-	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
 </div>
 
 </aside>
@@ -520,7 +506,7 @@ $(document).ready(function(){
 
 
 <div id="totop">
-<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 </div>
 
 <script src="/js/totop.js"></script>
