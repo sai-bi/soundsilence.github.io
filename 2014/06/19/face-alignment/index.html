@@ -1,0 +1,430 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Face Alignment | 醉飲春醪</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="soundsilencebisai">
+    
+    <meta name="description" content="MathJax.Hub.Config({tex2jax: {inlineMath: [[&#39;$&#39;,&#39;$&#39;], [&#39;\\(&#39;,&#39;\\)&#39;]]}});
+
+
+  MathJax.Hub.Config({ TeX: { extensions: [&quot;autobold.js&quot;] }});
+
+
+
+
+
+
+FYP第二階段做了一個有關人臉特徵點定位(facial landmarks detection)的東西，主要參考的是MSRA的一片論文Face alignment by explicit shape regression。跟以往的方法不同，這篇論文的方法中並沒有用一個parametric model去約束人臉的形狀，而是把訓練數據的線性組合作爲輸出的形狀。因爲訓練數據本身就是人臉，那麼很明顯他們的線性組合也是彼此約束的，因此特徵點之間的互相約束關係就自然而然被保留了下來。我當時雖然已經實現了相應的算法，但是準確度還是和論文中的有差別。放假後又花了些時間，做了點優化，現在準確度提高了很多，已經可以和論文中的相提並論了。在實現相應算法的時候，遇到了一些問題。下面一一闡述。
+###Shape indexed features這篇paper中用random fern作爲主要的regressor，而fern所用的feature就是像素的density的差值，這裏就牽涉到一個選取pixel的問題。最顯然的一種方法是對於所有圖片，選位置相同的像素，如下圖所示。但是這樣選像素有一個壞處，就是位置相同的像素並不一定具有相同的含意。這篇paper應用了shape indexed feature，也就是在確定每一個pixel的位置的時候，是先找到離他最近的關鍵點，然後在關鍵點建立局部座標系，那麼pixel的位置就用這個局部座標來表示。這種方法當然比用全局座標來表示要好，但其時局部座標一樣的點就一定有相同的語意嗎？並不一定。在一篇新的論文中Robust face landmark estimation under occlusion中就用兩個關鍵點來定位一個pixel。">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="醉飲春醪" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="醉飲春醪">醉飲春醪</a></h1>
+				<h2 class="blog-motto">在這急景流年的人生裏，我願高舉這盛到杯緣的春醪暢飲</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:soundsilence.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/06/19/face-alignment/" title="Face Alignment" itemprop="url">Face Alignment</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://soundsilence.github.io/about" title="soundsilencebisai" target="_blank" itemprop="author">soundsilencebisai</a>
+		
+  <p class="article-time">
+    <time datetime="2014-06-20T05:57:38.000Z" itemprop="datePublished"> Published Jun 19 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<script type="text/x-mathjax-config">
+MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["autobold.js"] }});
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<p>FYP第二階段做了一個有關<code>人臉特徵點定位(facial landmarks detection)</code>的東西，主要參考的是MSRA的一片論文<em>Face alignment by explicit shape regression</em>。跟以往的方法不同，這篇論文的方法中並沒有用一個parametric model去約束人臉的形狀，而是把訓練數據的線性組合作爲輸出的形狀。因爲訓練數據本身就是人臉，那麼很明顯他們的線性組合也是彼此約束的，因此特徵點之間的互相約束關係就自然而然被保留了下來。我當時雖然已經實現了相應的算法，但是準確度還是和論文中的有差別。放假後又花了些時間，做了點優化，現在準確度提高了很多，已經可以和論文中的相提並論了。在實現相應算法的時候，遇到了一些問題。下面一一闡述。</p>
+<p>###Shape indexed features<br>這篇paper中用random fern作爲主要的regressor，而fern所用的feature就是像素的density的差值，這裏就牽涉到一個選取pixel的問題。最顯然的一種方法是對於所有圖片，選位置相同的像素，如下圖所示。但是這樣選像素有一個壞處，就是位置相同的像素並不一定具有相同的含意。這篇paper應用了shape indexed feature，也就是在確定每一個pixel的位置的時候，是<code>先找到離他最近的關鍵點，然後在關鍵點建立局部座標系</code>，那麼pixel的位置就用這個局部座標來表示。這種方法當然比用全局座標來表示要好，但其時局部座標一樣的點就一定有相同的語意嗎？並不一定。在一篇新的論文中<em>Robust face landmark estimation under occlusion</em>中就用兩個關鍵點來定位一個pixel。<br><a id="more"></a></p>
+<center><br><img src="https://dl.dropboxusercontent.com/u/47747425/Photo/shape_index.png" alt="shape indexed features"><br></center><br><h3>Mean shape</h3><br>另外一個問題是，人臉的形狀差異很大，那麼爲了減少這樣一個差異，我們需要先對所有的形狀進行alignment，把他們映射到同一個框架中。這裏常用的一種方法是<br><a href="http://en.wikipedia.org/wiki/Procrustes_analysis" target="_blank" rel="external">Procrustes Analysis</a>。如果我們用$S = [x_1,x_2,…,x_N,y_1,y_2,…,y_N]$表示一個形狀, 那麼這種方法就是要讓<br>$D = \sum|S_i - \bar{S}|^2$最小。然而如果我們不對$\bar{S}$作出限制，比如說限制它必須是unit scale，必須中心在原點，這個最小化是沒有意義的。一個簡單的算法如下:<br><br><br><p><br>1. Translate each example so that its centre of gravity is at the origin. <br><br>2. Choose one example as an initial estimate of the mean shape and scale so that $|\bar{S}| = 1$<br><br>3. Record the first estimate as $\bar{S}$ to define the default reference frame.<br><br>4. Align all the shapes with the current estimate of the mean shape.<br><br>5. Re-estimate mean from aligned shapes.<br><br>6. Apply constraints on the current estimate of the mean by aligning it with $\bar{S}$ and scaling so that $|\bar{S}|= 1$.<br><br>7. If not converged, return to 4. (Convergence is declared if the estimate of the mean does not change significantly after an iteration)<br><br><br></p><br>在第4條中，提到了將所有shape與mean shape進行對齊(alignment)，這裏alignment所允許的操作將會影響到我們得到的最終結果。而論文中的操作被稱爲<code>similarity transform</code>。<br><br><h3>Similarity transform</h3><br>對於similarity transform，我們只允許<code>旋轉(rotation)</code>和<code>縮放(scale)</code>。假如我們有兩個形狀$S,S’$，中心都在原點，我們想要對$S$按照$(s,\theta))$進行縮放和旋轉從而使得$|s\mathbf{A}S- S’|$最，其中$A$是旋轉矩陣，那麼我們有如下結論：<br>$$<br>\begin{aligned}<br>a &amp;= (S * S’) /|S|^2 \\<br>b &amp;= \sum_{i=1}^{N}(x_i y_i’ - y_ix_i’) / |S|^2 \\<br>s^2 &amp;= a^2 + b^2 \\<br>\theta &amp;= tan^{-1} (b/a)<br>\end{aligned}<br>$$<br>具體證明如下：<br><center><br><img src="https://dl.dropboxusercontent.com/u/47747425/Photo/proof.png" alt="proof"><br></center>
+
+<script type="text/css">
+code{background:#F8F8FF; border:black dashed 1px; padding:6px}​
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Research/">Research</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/paper/">paper</a><a href="/tags/machine-learning/">machine learning</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://soundsilence.github.io/2014/06/19/face-alignment/" data-title="Face Alignment | 醉飲春醪" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/06/25/reverse-words-in-a-string/" title="Reverse Words in a String">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Reverse Words in a String</span>
+</a>
+</div>
+
+
+</nav>
+
+	
+
+<section class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/Leetcode/" title="Leetcode">Leetcode<sup>4</sup></a></li>
+		
+			<li><a href="/categories/Mathematics/" title="Mathematics">Mathematics<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Programming/" title="Programming">Programming<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Research/" title="Research">Research<sup>6</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/code/" title="code">code<sup>4</sup></a></li>
+		
+			<li><a href="/tags/paper/" title="paper">paper<sup>3</sup></a></li>
+		
+			<li><a href="/tags/computer-vision/" title="computer vision">computer vision<sup>2</sup></a></li>
+		
+			<li><a href="/tags/signal-processing/" title="signal processing">signal processing<sup>2</sup></a></li>
+		
+			<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
+		
+			<li><a href="/tags/programming/" title="programming">programming<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Intrinsic-Image/" title="Intrinsic Image">Intrinsic Image<sup>1</sup></a></li>
+		
+			<li><a href="/tags/graphics/" title="graphics">graphics<sup>1</sup></a></li>
+		
+			<li><a href="/tags/research/" title="research">research<sup>1</sup></a></li>
+		
+			<li><a href="/tags/tools/" title="tools">tools<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		
+		<a href="http://soundsilence.github.io/about" target="_blank" title="soundsilencebisai">soundsilencebisai</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'httpsoundsilencegithubio';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>

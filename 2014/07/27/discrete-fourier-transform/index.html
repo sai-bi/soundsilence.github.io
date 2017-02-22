@@ -1,0 +1,445 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Discrete Fourier Transform 1 | 醉飲春醪</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="soundsilencebisai">
+    
+    <meta name="description" content="##Fourier Analysis傅里葉分析 (Fourier Analysis) 包括一系列的數學方法，它們被用來將輸入信號分解為正余弦信號 (sinusoid) 。這種方法以法國數學家和物理學家傅里葉命名，因為他在這個領域作出了很多重要的發現，並且提出了該方法的實際應用。傅里葉在有關熱傳導的論文中作出了這樣的論斷：所有的連續週期性信號都可以用一系列正弦曲線的加和表示。兩位非常著名的數學家，拉格朗日和拉普拉斯審視了這篇論文。其中，拉普拉斯同意發表這篇論文，而拉格朗日認為，帶有“尖角”的信號不能用這種方式表示，因此不同意發表。於是這篇論文就遲遲不能發表，直到拉格朗日死後十五年。">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="醉飲春醪" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="醉飲春醪">醉飲春醪</a></h1>
+				<h2 class="blog-motto">在這急景流年的人生裏，我願高舉這盛到杯緣的春醪暢飲</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:soundsilence.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/07/27/discrete-fourier-transform/" title="Discrete Fourier Transform 1" itemprop="url">Discrete Fourier Transform 1</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://soundsilence.github.io/about" title="soundsilencebisai" target="_blank" itemprop="author">soundsilencebisai</a>
+		
+  <p class="article-time">
+    <time datetime="2014-07-28T06:36:35.000Z" itemprop="datePublished"> Published Jul 27 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>##Fourier Analysis<br>傅里葉分析 (Fourier Analysis) 包括一系列的數學方法，它們被用來將輸入信號分解為正余弦信號 (sinusoid) 。這種方法以法國數學家和物理學家傅里葉命名，因為他在這個領域作出了很多重要的發現，並且提出了該方法的實際應用。傅里葉在有關熱傳導的論文中作出了這樣的論斷：所有的連續週期性信號都可以用一系列正弦曲線的加和表示。兩位非常著名的數學家，拉格朗日和拉普拉斯審視了這篇論文。其中，拉普拉斯同意發表這篇論文，而拉格朗日認為，帶有“尖角”的信號不能用這種方式表示，因此不同意發表。於是這篇論文就遲遲不能發表，直到拉格朗日死後十五年。</p>
+<a id="more"></a>
+<p>那麼誰是正確的呢？這不能一概而論。拉格朗日是對的，正弦線之和的確不能表示帶有尖角的信號，比如方形波。但是，我們卻可以很接近它，直到二者的能量差值為 0。從這種意義上說，傅里葉是對的，儘管 18 世紀時人們還沒有能量的概念。</p>
+<p>###為什麼是正弦<br>我們知道，一個信號可以有無數種方法被分解，那麼為什麼我們選擇用正弦線來表示信號呢？為什麼不是方形波或者其他的類型呢？這是因為，我們對信號進行分解的目的是讓信號處理變得更加簡單，而正弦信號具有原始信號不具有的特質：正弦保真度（sinusoidal fidelity)。一個輸入的正餘弦信號輸出後仍然是正餘弦信號，只有振幅（amplitude）和相位（phase）發生了變化，頻率保持不變。因此，雖然方形波和三角形波分解也是可能的，但用處並不大。</p>
+<p>###傅里葉變化的類型<br>傅里葉變換可以根據輸入信號的類型分為四類：</p>
+<ul>
+<li>非週期性，連續：Fourier Transform</li>
+<li>週期性，連續：Fourier Series</li>
+<li>非週期性，離散：Discrete Time Fourier Transform</li>
+<li>週期性，離散：Discrete Fourier Transform</li>
+</ul>
+<p>這四種類型的信號都必須要從 $-\infty$ 延伸至 $+\infty$，因為，很顯然，正餘弦信號都是無限長度的，你不可能用一個無限長度的信號來表示有限長度的信號。那麼假如我們只有有限的一段信號，該怎麼進行處理呢？這種情況下，我們必須將該信號向左右延伸，比如，我們可以在信號左右兩端加無數個 0，那麼這時信號就變成了離散，非週期性的，我們可以用 DTFT 進行處理。或者，我們可以對該信號進行週期性重複，這時，信號就變成了離散，週期性的，我們可以用 DFT 進行處理。</p>
+<p>另外，對於非週期性的信號，我們需要無限多個正餘弦信號去合成它，這對於計算機來說是不可能實現的。同樣，電腦也不能處理連續的信號。因此，在實際應用種，我們可以進行的操作只有 DFT。</p>
+<p>根據數據的信息，上述四種傅里葉變換還可以分為實數和虛數版本。我們這裡先只關注實數。</p>
+<h3 id="DFT-的形式"><a href="#DFT-的形式" class="headerlink" title="DFT 的形式"></a>DFT 的形式</h3><p>如圖所示，DFT 將輸入信號種的 $N$ 個點轉化為 2 個各包含 $N/2+1$ 個點的信號。輸入信號包含待處理的信號，而兩個輸出信號包含的是正弦曲線和餘弦曲線的<strong>振幅</strong>。輸入信號被稱為處在 <code>Time Domain</code> 中，這是因為進入 DFT 的信號經常是每間隔一段時間取樣得到的。輸出信號被稱為處於 <code>Frequency Domain</code>。兩個 domain 種包含有同樣的信息，只是以不同的形式儲存。</p>
+<center><img src="https://dl.dropboxusercontent.com/u/47747425/Photo/Screen%20Shot%202014-07-26%20at%2021.43.42.png" alt="DFT 示意圖"></center>
+
+<p>Time Domain 中點的數量用 $N$ 表示，$N$ 可以是任意的正整數，但通常會取 2 的指數，比如 128，256，etc. 原因有兩個，首先，計算機中數據儲存是二進制，這使得採用 2 的指數變得非常自然。另外，計算 DFT 最高效的方法 <code>Fast Fourier Transform (FFT)</code> 中經常會把 $N$ 變成 2 的指數。</p>
+<p>另外，在信號處理中，我們經常用小寫字母來表示 time domain 信號，比如 $x[ ], y[ ]$, 而用大寫字母表示 frequency domain 中的信號，比如 $X[ ], Y[ ]$。這裡我們用 $x[ ]$ 表示 time domain 裡的信號，用 $X[ ]$ 表示 frequency domain 裡的信號，其中 $X$ 包含有兩個部分， 分別稱為 <code>Real part of X</code>, 表示為 <strong>Re X[ ]</strong>, <code>Imaginary part of  X</code>, 表示為 <strong>Im X[ ]</strong>，前者包含<strong>餘弦曲線的振幅</strong>，後者包含<strong>正弦曲線</strong>的振幅。這裡之所以命名為 real 和 imaginary 是來自於 complex DFT, 與 real DFT 無關。</p>
+<p>###Frequency Domain 中的獨立變量<br>在 frequency domain 中，橫軸的變量可以有四種形式：</p>
+<ul>
+<li>sample point index：假如有 $N$ 個採樣點，那麼橫軸可以從 0 到 $N/2$，比如 $Re X[0] \dots ReX[64]$</li>
+<li>fraction of sampling rate: 這種情況下，橫軸值 $f = k / N$ 總是從 0 到 0.5</li>
+<li>$2\pi*$ fraction of sampling rate   </li>
+<li>Use kHz in particular applications</li>
+</ul>
+<p>#DFT 的基礎函數<br>DFT 中運用的正弦和餘弦函數被稱為 <code>基礎函數（basis functions）</code>。基礎函數是振幅為 1 的正餘弦函數，當把 DFT 的輸出作為基礎函數的振幅時，基礎函數就變為了 scaled sine and cosine waves。DFT 基礎函數形式如下：<br>$$\begin{aligned} c_k[i] &amp; = \text{cos}( \frac{2\pi ki}{N}) \\ s_k[i] &amp; = \text{sin}( \frac{2\pi ki}{N}) \end{aligned}$$<br>其中，$k \in [0, N/2]$，$c_k[i]$ 的振幅是 $ReX[k]$,  $s_k[i]$ 的振幅是 $ImX[k]$。這裡有一個很重要的概念：</p>
+<blockquote>
+<p>The frequency parameter, k, is equal to the number of complete cycles that occur over the N points of the signal.</p>
+</blockquote>
+<center><img alt="" src="https://dl.dropboxusercontent.com/u/47747425/Photo/Screen%20Shot%202014-07-27%20at%209.08.41.png"></center>
+
+<p>如圖所示， $c_2[ ]$ 在 32 個點中完成了 2 個完整的循環，而 $s_{10}[ ]$ 則在 32 個點中完成了 10 個完整的循環。特殊地， 當 $k = 0$ 時，$c_0[ ]$ 取值總是為 1， 這樣我們知道， <strong>$ReX[0]$ 是所有輸入信號的平均值</strong>，我們稱 $ReX[0]$ 為 <code>DC offset</code>。此時，$s_0[ ]$ 取值總是為 0，因此它的振幅 $ImX[0]$ 就變得沒有意義了，我們總是直接把它設為 0。同樣地， 當 $k = N/2$ 時，$s_k[ ]$ 取值也總是 0， 它的振幅 $ImX[k]$ 也變得沒有意義了，我們也把它設為 0。</p>
+<p>這裡面存在一個問題：如果有 $N$ 個 sample 進入，我們的輸出中就會有 $(N/2 + 1)*2$ 個 sample，那麼這多出來的信息是從哪來的呢？答案很簡單，有一些 sample 中不包含任何信息，這些點就是 $ImX[0]$ 和 $ImX[N/2]$，他們的取值總是為 0。</p>
+<p>###DFT 的運算與逆運算<br>總而言之，DFT 的合成方程如下：<br>$$x[i] = \sum_{k=0}^{k = N/2}Re\bar{X}[k]\text{cos}(\frac{2\pi ki}{N}) +  \sum_{k=0}^{k = N/2}Im\bar{X}[k]\text{sin}(\frac{2\pi ki}{N}) $$<br>注意，這裡我們用了 $Re\bar{X}[k]$ 和 $Im\bar{X}[k]$ 來表示 振幅，而不是之前用的 $ReX[k]$ 和 $ImX[k]$。二者之間有一點不同，具體的關係如下：<br>$$\begin{aligned}Re\bar{X}[k] &amp;= \frac{ReX[k]}{N/2},  k \neq 0 \text{ and } k \neq N/2 \\<br>Re\bar{X}[k] &amp;= \frac{ReX[k]}{N},  k = 0 \text{ or } k = N/2 \\<br>Im\bar{X}[k] &amp;= -\frac{ImX[k]}{N/2},  k \neq 0 \end{aligned}$$<br>這其中的原因，要等到我們知道 $ReX[ ]$ 和 $ImX[ ]$ 是怎麼計算之後才能理解。</p>
+<center><img src="https://dl.dropboxusercontent.com/u/47747425/Photo/Screen%20Shot%202014-07-27%20at%209.57.24.png" alt=""> </center>
+
+
+
+
+ <script type="text/x-mathjax-config">
+   MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+ </script>
+ <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+ </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Mathematics/">Mathematics</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/signal-processing/">signal processing</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://soundsilence.github.io/2014/07/27/discrete-fourier-transform/" data-title="Discrete Fourier Transform 1 | 醉飲春醪" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/07/28/fourier-analysis-2/" title="Discrete Fourier Transform 2">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Discrete Fourier Transform 2</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/07/27/derive-intrinsic-images-from-image-sequences/"  title="Derive Intrinsic Images from Image Sequences">
+ <strong>下一篇：</strong><br/> 
+ <span>Derive Intrinsic Images from Image Sequences
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/Leetcode/" title="Leetcode">Leetcode<sup>4</sup></a></li>
+		
+			<li><a href="/categories/Mathematics/" title="Mathematics">Mathematics<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Programming/" title="Programming">Programming<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Research/" title="Research">Research<sup>6</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/code/" title="code">code<sup>4</sup></a></li>
+		
+			<li><a href="/tags/paper/" title="paper">paper<sup>3</sup></a></li>
+		
+			<li><a href="/tags/computer-vision/" title="computer vision">computer vision<sup>2</sup></a></li>
+		
+			<li><a href="/tags/signal-processing/" title="signal processing">signal processing<sup>2</sup></a></li>
+		
+			<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
+		
+			<li><a href="/tags/programming/" title="programming">programming<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Intrinsic-Image/" title="Intrinsic Image">Intrinsic Image<sup>1</sup></a></li>
+		
+			<li><a href="/tags/graphics/" title="graphics">graphics<sup>1</sup></a></li>
+		
+			<li><a href="/tags/research/" title="research">research<sup>1</sup></a></li>
+		
+			<li><a href="/tags/tools/" title="tools">tools<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		
+		<a href="http://soundsilence.github.io/about" target="_blank" title="soundsilencebisai">soundsilencebisai</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'httpsoundsilencegithubio';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>

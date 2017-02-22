@@ -1,0 +1,403 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Contour Detection and Image Segmentation | 醉飲春醪</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="soundsilencebisai">
+    
+    <meta name="description" content="1 ContributionsA high performance contour detector, combining local and global image infomrationA method to transform any contour signal into a hierarchy of regions while preserving contour quality2 Contour Detection and Segmentation">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="醉飲春醪" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="醉飲春醪">醉飲春醪</a></h1>
+				<h2 class="blog-motto">在這急景流年的人生裏，我願高舉這盛到杯緣的春醪暢飲</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:soundsilence.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/10/17/contour-detection-and-image-segmentation/" title="Contour Detection and Image Segmentation" itemprop="url">Contour Detection and Image Segmentation</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://soundsilence.github.io/about" title="soundsilencebisai" target="_blank" itemprop="author">soundsilencebisai</a>
+		
+  <p class="article-time">
+    <time datetime="2014-10-18T04:15:55.000Z" itemprop="datePublished"> Published Oct 17 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="globalWrapper"><br><br><h1 class="Section"><br><a class="toc" name="toc-Section-1">1</a> Contributions<br></h1><br><ul><br><li><br>A high performance contour detector, combining local and global image infomration<br></li><br><li><br>A method to transform any contour signal into a hierarchy of regions while preserving contour quality<br></li><br><br></ul><br><h1 class="Section"><br><a class="toc" name="toc-Section-2">2</a> Contour Detection and Segmentation<br></h1><br><br><a id="more"></a><br><div class="Unindented"><br>These two problems are related, but not identical. In general, contour detectors offer no guarantee that they will product closed contours and hence do not necessarily provide a partition of the image into regions. But, one can always recover closed contours from regions in the form of their boundaries.<br></div><br><h1 class="Section"><br><a class="toc" name="toc-Section-3">3</a> Previous Methods on Contours<br></h1><br><ul><br><li><br>Quantifying the presence of a boundary at a given image location through local measurements<ul><br><li><br>Roberts, Sobel, Prewitt operators: convolving a gray-scale image with local derivative filters<br></li><br><li><br>Canny detectors<br></li><br><li><br>Oriented energy approach<br></li><br><br></ul><br><br></li><br><li><br>Take into account of color and texture information, make use of learning approach for cue combination<br></li><br><li><br>Multi-scale detector<ul><br><li><br>Used to handle the problem of large range of scales at which objects may appear<br></li><br><br></ul><br><br></li><br><li><br>Globalization that utilizes local detector output<ul><br><li><br>Not only local information is considered, but global information is taken into account.<br></li><br><br></ul><br><br></li><br><br></ul><br><h1 class="Section"><br><a class="toc" name="toc-Section-4">4</a> Previous Methods on Regions<br></h1><br><ul><br><li><br>Integrate features such as <i>brightness, color, texture </i>over local image patches, then <i>clustering </i>these features based on different approaches<br></li><br><li><br>Graph based region merging algorithm<ul><br><li><br>Consider a graph in which pixels are nodes and edge weights measure the dissimilarity between nodes, merge the nodes if the edge weight is smaller than a certain theshold.<br></li><br><br></ul><br><br></li><br><li><br>Mean shift algorithm<br></li><br><li><br>Normalized cuts criterion<br></li><br><br></ul><br><h1 class="Section"><br><a class="toc" name="toc-Section-5">5</a> Contour Detection<br></h1><br><div class="Unindented"><br>The core part of contour detection is a function <span class="formula"><i>Pb</i>(<i>x</i>, <i>y</i>, <i>θ</i>)</span> that predicts <i>the posterior probability of a boundary with orientation <span class="formula"><i>θ</i></span> at each pixel <span class="formula">(<i>x</i>, <i>y</i>)</span>. </i>This is achieved by measuring the difference in local image brightness, color and texutre channel.<br></div><br><h2 class="Subsection"><br><a class="toc" name="toc-Subsection-5.1">5.1</a> Local Cues<br></h2><br><div class="Unindented"><br>The building block of <i>Pb </i>is an oriented gradient signal, <span class="formula"><i>G</i>(<i>x</i>, <i>y</i>, <i>θ</i>)</span>. This is done by place a circle at the pixel, which is divided into two half-discs by a diameter of angle <span class="formula"><i>θ</i></span>, then we can calculate histograms for both discs, and use their <span class="formula">χ<sup>2</sup></span> distance as the value of <i>G.</i><br></div><br><div class="Indented"><br><div class="float"><br><a class="Label" name="Figure-1"> </a><div class="figure"><br><center><br><img class="embedded" src="https://dl.dropboxusercontent.com/u/47747425/file/1_home_bisai_Pictures_Screenshot_from_2014-10-17_16_24_21.png" alt="figure Screenshot from 2014-10-17 16:24:21.png" style="max-width: 406px; max-height: 353px;"><br></center><br><div class="caption"><br>Figure 1 Oriented gradient of historgrams<br></div>
+
+<p></p></div><p></p>
+<p></p></div><p></p>
+<p></p></div><p></p>
+<div class="Indented"><br>This design is based on the intuition that <b>contours correspond to image discontinuities, and histograms provide a robust mechanism for modeling the content of an image region. </b>A strong oriented gradient signal, respons means a pixel is likely to lie on the boundary between two distinct regions.<br></div><br><div class="Indented"><br>This oriented gradient signal combines four features independently, the first three channels correspond to the channels of CIE Lab color space, that is, brightness, color a, color b.<br></div><br><div class="Indented"><br>The last channel is the texture channel, which assigns each pixel a texton id. These id are computed through the following procedures:<br></div><br><ul><br><li><br>Turn the image into grayscale<br></li><br><li><br>Convolve the grayscale image using 17 Gaussian derivative filter, therefore for each pixel, it has a 17-dimension feature.<br></li><br><li><br>Use <i>k-means </i>to cluster the pixels into K clusters, then the id for each pixel is its cluster id.<br></li><br><br></ul><br><h2 class="Subsection"><br><a class="toc" name="toc-Subsection-5.2">5.2</a> Multiscale Cues Combination<br></h2><br><div class="Unindented"><br>Here the multiscale mainly refers to the size of the circle in local cues. This paper considers gradients at three scales <span class="formula">[<span class="fraction"><span class="ignored">(</span><span class="numerator"><i>σ</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>, <i>σ</i>, 2<i>σ</i>]</span> for each of the four channels. Therefore, the final multiscale signal is:<br><br>$$<br>mPb(x,y,\theta) = \sum_{s} \sum_{i} \alpha_{i,s} G_{i,\theta(i,s)} (x,y,\theta)<br>$$<br><br></div><br><div class="Indented"><br>where <span class="formula"><i>s</i></span> indexes scales, <span class="formula"><i>i</i></span> indexes feature channels. After this, we can take the maximum response over orientation yields a measure of boundary strength at each pixel:<br>$$<br>mPb(x,y,\theta) = \text{max}_{\theta}\{mPb(x,y,\theta)\}<br>$$<br><br></div><br><div class="Indented"><br>Here <span class="formula"><i>θ</i></span> is sampled evenly between <span class="formula">[0, <i>π</i>].</span><br></div><br><h2 class="Subsection"><br><a class="toc" name="toc-Subsection-5.3">5.3</a> Globalization<br></h2><br><div class="Unindented"><br>For this part, I haven’t been able to get a good understanding about the linear system <span class="formula">(<i>D</i> − <i>W</i>)<b>v</b> = <i>λ</i><i>D</i><b>v</b></span>. This idea comes from the paper &ldquo;<i>Normalized Cuts and Image Segmentation</i>&rdquo;. And I will study it in another post.<br></div><br><div class="Indented"><br>The final gradient signal is a combination of local signal and global signal.<br></div><br><h1 class="Section"><br><a class="toc" name="toc-Section-6">6</a> Segmentation<br></h1><br><div class="Unindented"><br>The gradient signal has been got for each pixel, however, at this stage what we got is clutter edges. We have to do further processing to get closed regions. Suppose that <span class="formula"><i>E</i>(<i>x</i>, <i>y</i>, <i>θ</i>)</span> predicts the probability of an image boundary at location <span class="formula">(<i>x</i>, <i>y</i>)</span> and orientation <span class="formula"><i>θ</i></span>. This is done by:<br></div><br><ul><br><li><br>For each pixel, we define <span class="formula"><i>E</i>(<i>x</i>, <i>y</i>) = max<sub><i>θ</i></sub><i>E</i>(<i>x</i>, <i>y</i>, <i>θ</i>)</span><br></li><br><li><br>Take the regional minima of <span class="formula"><i>E</i>(<i>x</i>, <i>y</i>)</span> as seed locations<br></li><br><li><br>Apply watershed transform used in mathematical morphology<br></li><br><br></ul><br><div class="Unindented"><br>Watershed transform will generally result in over-segmentation. Therefore, Ultrametric Contour Map(UCM) is introduced, which defines a duality between closed, non-self-intersection weighted contours and a hierarchy of regions. Suppose we have an initial graph <span class="formula"><i>G</i> = (<i>P</i><sub>0</sub>, <i>K</i><sub>0</sub>, <i>W</i>(<i>K</i><sub>0</sub>))</span>, where <span class="formula"><i>P</i><sub>0</sub></span> are the nodes, <span class="formula"><i>K</i><sub>0</sub></span> are the arcs, <span class="formula"><i>W</i>(<i>K</i><sub>0</sub>)</span> are a measure of dissimilarity between regions, the UCM is built as following:<br></div><br><div class="Indented"><br><div class="float"><br><a class="Label" name="Figure-2"> </a><br><div class="figure"><br><center><br><img class="embedded" src="https://dl.dropboxusercontent.com/u/47747425/file/Screenshot%20from%202014-10-17%2021%3A10%3A40.png" style="max-width: 642px; max-height: 230px;"><br></center><br><div class="caption"><br>Figure 2 Algorithm for building UCM<br></div>
+
+<p></p></div><p></p>
+<p></p></div><p></p>
+<p></p></div><p></p>
+<div class="Indented"><br>This process produces a tree of regions, where the leaves are the inital elements of <span class="formula"><i>P</i><sub>0</sub>, </span> the root is the entire image. In the paper, the dissimilarity measure <span class="formula"><i>W</i>(<i>K</i><sub>0</sub>)</span> is defined as the average strength of the common boundary of two adjacent regions.<br></div>
+
+<p></p></div><p></p>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["autobold.js"] }});
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Research/">Research</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/computer-vision/">computer vision</a><a href="/tags/paper/">paper</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://soundsilence.github.io/2014/10/17/contour-detection-and-image-segmentation/" data-title="Contour Detection and Image Segmentation | 醉飲春醪" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/11/16/fast-approximation-energy-minimization-via-graph-cut/" title="Fast Approximation Energy Minimization via Graph Cut">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Fast Approximation Energy Minimization via Graph Cut</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/31/opencv-with-visual-studio-2012/"  title="OpenCV with Visual Studio 2012">
+ <strong>下一篇：</strong><br/> 
+ <span>OpenCV with Visual Studio 2012
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/Leetcode/" title="Leetcode">Leetcode<sup>4</sup></a></li>
+		
+			<li><a href="/categories/Mathematics/" title="Mathematics">Mathematics<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Programming/" title="Programming">Programming<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Research/" title="Research">Research<sup>6</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/code/" title="code">code<sup>4</sup></a></li>
+		
+			<li><a href="/tags/paper/" title="paper">paper<sup>3</sup></a></li>
+		
+			<li><a href="/tags/computer-vision/" title="computer vision">computer vision<sup>2</sup></a></li>
+		
+			<li><a href="/tags/signal-processing/" title="signal processing">signal processing<sup>2</sup></a></li>
+		
+			<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
+		
+			<li><a href="/tags/programming/" title="programming">programming<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Intrinsic-Image/" title="Intrinsic Image">Intrinsic Image<sup>1</sup></a></li>
+		
+			<li><a href="/tags/graphics/" title="graphics">graphics<sup>1</sup></a></li>
+		
+			<li><a href="/tags/research/" title="research">research<sup>1</sup></a></li>
+		
+			<li><a href="/tags/tools/" title="tools">tools<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		
+		<a href="http://soundsilence.github.io/about" target="_blank" title="soundsilencebisai">soundsilencebisai</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'httpsoundsilencegithubio';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>

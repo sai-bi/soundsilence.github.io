@@ -1,0 +1,532 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>A Study of Intrinsic Image | 醉飲春醪</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="soundsilencebisai">
+    
+    <meta name="description" content="###Derive Intrinsic Images from Image Sequences (ICCV 2001)
+
+Assumption: when derivative filters are applied to natural images, the filter output tend to be sparse.
+Multiple images from a video: same reflectance image, different illumination
+$I = R \times L \xrightarrow{\text{log}} i = r + l   \xrightarrow{\text{apply filter } f_n} o_n = r_n + l_n$ 
+Assume $l_n$ satisfies Laplacian distribution, $P(o_n | r_n) = \frac{1}{Z} \prod_{x,y,t}e ^ {-\beta|o_n(x,y,t) - r_n(x,y)|}$
+Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="醉飲春醪" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="醉飲春醪">醉飲春醪</a></h1>
+				<h2 class="blog-motto">在這急景流年的人生裏，我願高舉這盛到杯緣的春醪暢飲</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:soundsilence.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/17/a-study-of-intrinsic-image/" title="A Study of Intrinsic Image" itemprop="url">A Study of Intrinsic Image</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://soundsilence.github.io/about" title="soundsilencebisai" target="_blank" itemprop="author">soundsilencebisai</a>
+		
+  <p class="article-time">
+    <time datetime="2014-08-18T00:29:39.000Z" itemprop="datePublished"> Published Aug 17 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>###Derive Intrinsic Images from Image Sequences (ICCV 2001)</p>
+<ul>
+<li>Assumption: when derivative filters are applied to natural images, the filter output tend to be sparse.</li>
+<li>Multiple images from a video: same reflectance image, different illumination</li>
+<li>$I = R \times L \xrightarrow{\text{log}} i = r + l   \xrightarrow{\text{apply filter } f_n} o_n = r_n + l_n$ </li>
+<li>Assume $l_n$ satisfies Laplacian distribution, $P(o_n | r_n) = \frac{1}{Z} \prod_{x,y,t}e ^ {-\beta|o_n(x,y,t) - r_n(x,y)|}$</li>
+<li>Maximize $p(o_n | r_n)$, get the $r_n$, recover $r$ from $r_n$</li>
+</ul>
+<a id="more"></a>
+<p>###Intrinsic Images Decomposition Using a Local and Global Sparse Representation of Reflectance (CVPR 2011)</p>
+<ul>
+<li>Assumption: neighboring pixels usually have the same reflectance if their chromaticities are the same or very similar. </li>
+<li>Use the assumption to restrict the reflectance of <em>similar pixels</em></li>
+<li>Constraints on pixels:<ul>
+<li>Smoothness of illumination: minimize $J_{smooth} = \sum||\bigtriangledown^2L||$</li>
+<li>Reflectance weighting: more smooth at similar pixels $\rightarrow$ larger weights at those locations</li>
+<li>Reflectance image should be sparse: total variation cost at locations where neighboring chromaticities are significantly different.</li>
+</ul>
+</li>
+<li>Minimization energy function</li>
+</ul>
+<p>###Intrinsic Image Decomposition with Non-local Texture Cues (CVPR 2008)</p>
+<ul>
+<li>Assumption: distinct points with the same intensity-normalized texture configuration generally have the same reflectance value.</li>
+<li>Intensity-normalized texture: use the neighbour pixels’ intensity-normalized color values(chromaticity) to represent texture information</li>
+<li>Divide pixels into different groups: pixels in the same group have the same reflectance</li>
+<li>Minimization: weighted refletance difference of neighbours &amp; shading derivatives</li>
+</ul>
+<p>###Intrinsic Images Using Optimization (CVPR 2011)</p>
+<ul>
+<li>Assumption: neighboring pixels in a local window of a single image having similar intensity values should have similar reflectance values.</li>
+<li>Each pixel’s reflectance value is a weighted sum of its neighbours’ reflectance values: $R_i = \sum_{j \in N(i)} w_{ij} R_j$</li>
+<li>Energy function: $E(R,s) = \sum_{i \in p} (R_i - \sum_{j \in N(i)} w_{ij} R_j )^2 + \sum_{i \in p}(I_i / s_i - R_i)^2$</li>
+<li>Minimize energy function</li>
+</ul>
+<p>###Intrinsic Images by Clustering (CGF 2012)</p>
+<ul>
+<li>Assumption: regions of similar chromaticity in the input image have the same reflectance</li>
+<li>Segment input images according to chromaticity $\rightarrow$ subdivide the segment into clusters $\rightarrow$ refine clusters </li>
+<li>Segment: CIElab color space, feature $(\beta,a,b)$, k-means</li>
+<li>Clustering: divide segment into small windows, then merge the window with its neighour windows with smallest chrominance difference</li>
+<li>Refine clusters: merge small clusters, merge smooth boundaries</li>
+<li>Constraints:<ul>
+<li>Luminance continuity ($C^0$ continuity): adjacent clusters have the same luminance</li>
+<li>Cluster of similar reflectance: all clusters coming from the same segment have the same reflectance</li>
+</ul>
+</li>
+<li>Solve linear system</li>
+</ul>
+<p>###Intrinsic Images in the Wild (SIGGRAPH 2014)</p>
+<ul>
+<li>Assumption: shading smoothness, reflectance sparseness</li>
+<li>Energy function: $E(x) = w_p E_p(x) + w_s E_s(x) + w_l E_l(x) $<ul>
+<li>$E_p$: constrain reflectance, encourage pixels with the similar <em>positions, intensity, chromaticity</em> should have similar reflectance.</li>
+<li>$E_s$: shading smoothness</li>
+<li>$E_l$: avoid extreme shading values</li>
+</ul>
+</li>
+<li>Judgement: WHDR, compare human judgement and algorithm output</li>
+</ul>
+<p>###Intrinsic Video and Applications (SIGGRAPH 2014)</p>
+<ul>
+<li>Initial decomposition for the first frame: cluster based </li>
+<li>Propagation: for the next frame, for each pixel, find the cluster that it belongs in the previous frame. <ul>
+<li>Determine cluster index through <em>Maximium A Posterior (MAP)</em></li>
+<li>Only assign index to pixels with higher confidence</li>
+</ul>
+</li>
+<li>Stop condition:  number of unassigned pixels in a window $&gt; 80\%$</li>
+<li>Make use of known reflectance pixels as constraints to determine unknown pixels</li>
+<li>Backward propagation</li>
+<li>Coarse-to-fine: determine unassigned pixel values through <em>Possion Blending</em></li>
+</ul>
+<p>###Estimating Intrinsic Component Images using Non-Linear Regression (CVPR 2006)</p>
+<ul>
+<li>Different from other approaches which focus on reflectance images, this method focuses on recovering shading image first. </li>
+<li>Non-linear regression: the intrinsic component $c$ of a pixel is evaluated as $r(o)$<ul>
+<li>$o$ is a feature vector generated from a patch of the image</li>
+<li>$r$ is a non-linear function $o$, supervised training needed</li>
+<li>Select patches: boosting</li>
+</ul>
+</li>
+<li>We can have multiple $r$ with different weights, which could also be learnt.</li>
+</ul>
+<p>###User-Assisted Intrinsic Images (SIGGRAPH Asia 2009)</p>
+<ul>
+<li>Assumption: reflectance variations lie locally in a plane in color space, pixels in planes parallel to the reflectance have constant illumination. </li>
+<li>There exist $3D$ vector $\mathbf{a}$ such that that $\mathbf{a * R} = 1 \rightarrow \mathbf{a * I = s} $   </li>
+<li>Minimize energy function $\sum(s - \mathbf{a*I})$<ul>
+<li>$\mathbf{a}$ can be represented as a function of $s$</li>
+</ul>
+</li>
+<li>User interaction<ul>
+<li>constant reflectance brush: penalize reflectance difference of pixels covered by brushes</li>
+<li>constant illumination brush: penalize illumination difference of pixels covered by brushes</li>
+<li>fixed-illumination brush: user can assign a fixed value to illumination </li>
+</ul>
+</li>
+</ul>
+<p>###Color Constancy, Intrinsic Images, and Shape Estimation (ECCV 2012)</p>
+<ul>
+<li>A unified approach for solving three problems</li>
+<li>Problem formulation:  $\text{minimize}_{(Z,R,L)} g(R) + f(Z) + h(L)$, subject to $I = R + S(Z,L)$<ul>
+<li>R: log-reflectance map</li>
+<li>Z: depth map</li>
+<li>L: model of illumination</li>
+<li>S(Z,L): rendering engine, produce a log-shading image given Z and L</li>
+</ul>
+</li>
+<li>$g(R) = w_s g_s(R) + w_e g_e(R) + w_a g_a(R)$<ul>
+<li>$g_s(R)$: priors on local reflectance smoothness, a multivariate Gaussian Scale Mixture placed on the difference between each reflectance pixel and its neighbors</li>
+<li>$g_e(R)$: priors on global entropy of reflectance, reflectance tends to be sparse, this can be enforced by minimizing entropy of reflectance</li>
+<li>$g_a(R)$: absolute prior on each pixel in $R$ that prefers some colors over others, addressing color constancy</li>
+</ul>
+</li>
+<li>Priors on illumination<ul>
+<li>Spherical-harmonic model </li>
+<li>Fit a Gaussian distribution on training dataset</li>
+</ul>
+</li>
+</ul>
+<p>##Summary</p>
+<p>###Priors</p>
+<ul>
+<li>Shading smoothness</li>
+<li>Reflectance sparseness and piecewise constant</li>
+<li>Texture indicators: same texture, same reflectance</li>
+</ul>
+<p>###Methods</p>
+<ul>
+<li>Optimization</li>
+<li>Propagation</li>
+<li>Probability inference</li>
+</ul>
+ <script type="text/x-mathjax-config">
+   MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+ </script> 
+ <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+ </script>
+
+
+
+
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Research/">Research</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Intrinsic-Image/">Intrinsic Image</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://soundsilence.github.io/2014/08/17/a-study-of-intrinsic-image/" data-title="A Study of Intrinsic Image | 醉飲春醪" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/31/opencv-with-visual-studio-2012/" title="OpenCV with Visual Studio 2012">
+  <strong>上一篇：</strong><br/>
+  <span>
+  OpenCV with Visual Studio 2012</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/07/28/fourier-analysis-2/"  title="Discrete Fourier Transform 2">
+ <strong>下一篇：</strong><br/> 
+ <span>Discrete Fourier Transform 2
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/Leetcode/" title="Leetcode">Leetcode<sup>4</sup></a></li>
+		
+			<li><a href="/categories/Mathematics/" title="Mathematics">Mathematics<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Programming/" title="Programming">Programming<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Research/" title="Research">Research<sup>6</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/code/" title="code">code<sup>4</sup></a></li>
+		
+			<li><a href="/tags/paper/" title="paper">paper<sup>3</sup></a></li>
+		
+			<li><a href="/tags/computer-vision/" title="computer vision">computer vision<sup>2</sup></a></li>
+		
+			<li><a href="/tags/signal-processing/" title="signal processing">signal processing<sup>2</sup></a></li>
+		
+			<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
+		
+			<li><a href="/tags/programming/" title="programming">programming<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Intrinsic-Image/" title="Intrinsic Image">Intrinsic Image<sup>1</sup></a></li>
+		
+			<li><a href="/tags/graphics/" title="graphics">graphics<sup>1</sup></a></li>
+		
+			<li><a href="/tags/research/" title="research">research<sup>1</sup></a></li>
+		
+			<li><a href="/tags/tools/" title="tools">tools<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		
+		<a href="http://soundsilence.github.io/about" target="_blank" title="soundsilencebisai">soundsilencebisai</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'httpsoundsilencegithubio';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>

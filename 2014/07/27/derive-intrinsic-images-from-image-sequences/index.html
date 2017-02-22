@@ -1,0 +1,397 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Derive Intrinsic Images from Image Sequences | 醉飲春醪</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="soundsilencebisai">
+    
+    <meta name="description" content="Intrinsic image 由 H.G. Barrow 和 J.M. Tenenbaum 於 1978 年提出，作為一種對原始圖像的分解方法。 它把原始圖像分解為 refletance image 和 illumination image。這是一種 midlevel 的場景表示方式，因為它並不能反映圖像特徵的物理成因，而且 intrinsic image 是與 viewpoint 有關的。儘管如此，它還是有著很廣泛的應用，比如在圖像分割問題中，一個經常困擾我們的問題就是陰影問題，但是如果我們能夠得到正確的反射圖像，並在反射圖像上進行分割，那麼就會簡單很多了，具體如 下圖所示：">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="醉飲春醪" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="醉飲春醪">醉飲春醪</a></h1>
+				<h2 class="blog-motto">在這急景流年的人生裏，我願高舉這盛到杯緣的春醪暢飲</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:soundsilence.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/07/27/derive-intrinsic-images-from-image-sequences/" title="Derive Intrinsic Images from Image Sequences" itemprop="url">Derive Intrinsic Images from Image Sequences</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://soundsilence.github.io/about" title="soundsilencebisai" target="_blank" itemprop="author">soundsilencebisai</a>
+		
+  <p class="article-time">
+    <time datetime="2014-07-28T01:53:24.000Z" itemprop="datePublished"> Published Jul 27 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>Intrinsic image 由 H.G. Barrow 和 J.M. Tenenbaum 於 1978 年提出，作為一種對原始圖像的分解方法。 它把原始圖像分解為 <code>refletance image</code> 和 <code>illumination image</code>。這是一種 midlevel 的場景表示方式，因為它並不能反映圖像特徵的物理成因，而且 intrinsic image 是與 viewpoint 有關的。儘管如此，它還是有著很廣泛的應用，比如在圖像分割問題中，一個經常困擾我們的問題就是陰影問題，但是如果我們能夠得到正確的反射圖像，並在反射圖像上進行分割，那麼就會簡單很多了，具體如 下圖所示：<br><a id="more"></a></p>
+<center> <img src="https://dl.dropboxusercontent.com/u/47747425/Photo/Screen%20Shot%202014-07-27%20at%2017.57.08.png" alt="Intrinsic Image"> </center>
+
+<p>但同時 intrinsic image 也是一個經典的 ill-posed 問題。假如我們用 $I(x,y)$ 表示原始圖像，用 $R(x,y)$ 表示反射圖像，用 $L(x,y)$ 表示光照圖像，那麼它們之間滿足：$$I(x,y) = R(x,y) L(x,y)$$</p>
+<p>很顯然，我們只有一個已知量 $I$, 卻有兩個未知量，我們總可以設 $L(x,y) = 1，R(x,y) = I(x,y)$ 來滿足條件，但這樣是毫無意義的。</p>
+<p>今天看的這篇論文  Derive Intrinsic Images from Image Sequences, 將這個問題簡單化。它要解決的問題是：<strong>如果我們有一系列的圖像，它們的反射圖像保持不變，只有光照圖像發生變化，我們能不能確定 intrinsic image 呢？</strong>。也就是說，在這一系列圖像中，場景不發生變化，只有光照條件發生了變化。很顯然，這依舊是一個 ill-posed 問題，因為現在 $I(x,y,t) = R(x,y) L(x,y,t)$，這仍然是 <code>under-determined</code>。論文中，作者提出了一些假設，並且基於這些假設利用 <strong> maximum likelihood</strong> 方法得到最終的反射圖像。</p>
+<p>###假設<br>這篇文章最重要的基礎是這樣一個事實: <strong>when derivative filters are applied to natural images, the filter output tend to be sparse</strong>， 並且這一點即使我們對圖像取<code>對數</code>後仍然成立。下面的圖可以闡釋這一點。並且，我們觀察可以發現，filter output 的分佈很接近於  <code>Laplcian Distribution</code>。因此作者作出了下面的假設：<strong> when derivative filters are applied to L(x,y,t)，the resulting output satisfy the Laplacian distribution $P(x) = \frac{1}{Z} e^{-\alpha |x|}$</strong>。</p>
+<center> <img src="https://dl.dropboxusercontent.com/u/47747425/Photo/Screen%20Shot%202014-07-27%20at%2018.16.54.png" alt="assumption"></center>
+
+<p>###推導<br>如果我們用 $i, r , l$ 分別表示 $I, R, L$ 的對數，很顯然，$i = l + r$。現在，我們假設有 $N$ 個 filter $f_n$，我們用 $o_n$ 表示 $i_n$ 的 filter output，用 $r_n$ 表示 $r$ 的 filter output, 我們有:<br>$$o_n(x,y,t) = i \star f_n$$<br>$$r_n = r \star f_n$$<br>假設 filter output 是獨立的，那麼我們可以得到 ML 為：<br>$$\begin{aligned} P(o_n | r_n) &amp;= \frac{1}{Z} \prod_{x,y,t}e ^ {-\beta|o_n(x,y,t) - r_n(x,y)|} \\ &amp;= \frac{1}{Z} e ^ {-\beta\sum_{x,y,t}|o_n(x,y,t) - r_n(x,y)|}   \end{aligned}$$<br>很顯然，我們有 $r_n(x,y) = \text{median}_t o_n(x,y,t)$。剩下的任務就只是從 $r_n$ 中得到 $r$ 了。這裡略去不講。</p>
+<p>同時，作者也論證了，即使 filter output 不準確滿足 Laplacian distribution, 該方法依舊可以適用，並且在只有 3 幀圖像的情況下， 93% 的點誤差在 1% 之內，而在有 5 幀圖像的情況下，97% 的點誤差在 1% 之內。</p>
+<script type="text/x-mathjax-config">
+   MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+ </script>
+ <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+ </script>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Research/">Research</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/graphics/">graphics</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://soundsilence.github.io/2014/07/27/derive-intrinsic-images-from-image-sequences/" data-title="Derive Intrinsic Images from Image Sequences | 醉飲春醪" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/07/27/discrete-fourier-transform/" title="Discrete Fourier Transform 1">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Discrete Fourier Transform 1</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/07/21/copy-constructor/"  title="Copy Constructor">
+ <strong>下一篇：</strong><br/> 
+ <span>Copy Constructor
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/Leetcode/" title="Leetcode">Leetcode<sup>4</sup></a></li>
+		
+			<li><a href="/categories/Mathematics/" title="Mathematics">Mathematics<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Programming/" title="Programming">Programming<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Research/" title="Research">Research<sup>6</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/code/" title="code">code<sup>4</sup></a></li>
+		
+			<li><a href="/tags/paper/" title="paper">paper<sup>3</sup></a></li>
+		
+			<li><a href="/tags/computer-vision/" title="computer vision">computer vision<sup>2</sup></a></li>
+		
+			<li><a href="/tags/signal-processing/" title="signal processing">signal processing<sup>2</sup></a></li>
+		
+			<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
+		
+			<li><a href="/tags/programming/" title="programming">programming<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Intrinsic-Image/" title="Intrinsic Image">Intrinsic Image<sup>1</sup></a></li>
+		
+			<li><a href="/tags/graphics/" title="graphics">graphics<sup>1</sup></a></li>
+		
+			<li><a href="/tags/research/" title="research">research<sup>1</sup></a></li>
+		
+			<li><a href="/tags/tools/" title="tools">tools<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		
+		<a href="http://soundsilence.github.io/about" target="_blank" title="soundsilencebisai">soundsilencebisai</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'httpsoundsilencegithubio';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>

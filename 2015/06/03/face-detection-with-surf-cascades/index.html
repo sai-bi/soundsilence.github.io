@@ -1,0 +1,426 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Face Detection with SURF Cascades | 醉飲春醪</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="soundsilencebisai">
+    
+    <meta name="description" content="Feature DescriptorsSURF is short for Speeded Up Robust Features
+Local scale
+Rotation invariant
+
+How the feature is calculated?Suppose we have an image">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="醉飲春醪" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="醉飲春醪">醉飲春醪</a></h1>
+				<h2 class="blog-motto">在這急景流年的人生裏，我願高舉這盛到杯緣的春醪暢飲</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:soundsilence.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/06/03/face-detection-with-surf-cascades/" title="Face Detection with SURF Cascades" itemprop="url">Face Detection with SURF Cascades</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://soundsilence.github.io/about" title="soundsilencebisai" target="_blank" itemprop="author">soundsilencebisai</a>
+		
+  <p class="article-time">
+    <time datetime="2015-06-03T23:06:11.000Z" itemprop="datePublished"> Published Jun 3 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<h2 id="Feature-Descriptors"><a href="#Feature-Descriptors" class="headerlink" title="Feature Descriptors"></a>Feature Descriptors</h2><h4 id="SURF-is-short-for-Speeded-Up-Robust-Features"><a href="#SURF-is-short-for-Speeded-Up-Robust-Features" class="headerlink" title="SURF is short for Speeded Up Robust Features"></a>SURF is short for <code>Speeded Up Robust Features</code></h4><ul>
+<li>Local scale</li>
+<li>Rotation invariant</li>
+</ul>
+<h4 id="How-the-feature-is-calculated"><a href="#How-the-feature-is-calculated" class="headerlink" title="How the feature is calculated?"></a>How the feature is calculated?</h4><p>Suppose we have an image patch, the feature is calculated as following:</p>
+<blockquote>
+<ol>
+<li>Calculate horizontal gradient $d_x$ with kernel $[-1, 0, 1]$</li>
+<li>Calculate vertial gradient $d_y$ with kernel $[-1, 0, 1]^T$</li>
+<li>Calculate the sum of $d_x$ and $|d_x|$ for $d_y &lt; 0$ and $d_y &gt; 0$, as well as the sum of $d_y$ and $|d_y|$ for $d_x<br>&lt; 0$ and $d_x &gt; 0$ </li>
+<li>Contacate all 8 numbers to form SURF for the patch </li>
+</ol>
+</blockquote>
+<h2 id="Feature-Extraction-for-Person-Detection"><a href="#Feature-Extraction-for-Person-Detection" class="headerlink" title="Feature Extraction for Person Detection"></a>Feature Extraction for Person Detection</h2><h4 id="The-algorithms-for-extracting-feature-over-an-image"><a href="#The-algorithms-for-extracting-feature-over-an-image" class="headerlink" title="The algorithms for extracting feature over an image:"></a>The algorithms for extracting feature over an image:</h4><blockquote>
+<ol>
+<li>Define a detection template, for example $40 \times 40$</li>
+<li>Fix a patch size, which can be of different size, for example, from $12 \times 12$ to $40 \times 40$. This patch is called a <code>local patch</code>.</li>
+<li>Divide each local patch into $2 \times 2$ <code>cells</code>, and calculate SURF feature for each cell. Then each local patch is represented by concatating all SURF features in the cells, which should be $4 * 8 = 32$ dimensions.</li>
+<li>Normalize the 32 dimension array with $L_2$ to form the final feature vector</li>
+<li>Slide the local patch with fixed step size within the window to get the feature for other local patches.</li>
+</ol>
+</blockquote>
+<h4 id="Note-the-following"><a href="#Note-the-following" class="headerlink" title="Note the following:"></a>Note the following:</h4><p>The local patch may not be squre, and the ratio between width and height could be $2 \times 1, 2 \times 3$ and so on.<br>For the cell, each local patch can be divided into $2 \times 2$ cells, and it could also be divided into $1 \times 4$ cells and other formats.</p>
+<h4 id="Speed-up"><a href="#Speed-up" class="headerlink" title="Speed up:"></a>Speed up:</h4><p>We may make use of <a href="https://en.wikipedia.org/wiki/Summed_area_table" target="_blank" rel="external"><code>integral image(summed area table)</code></a> to speed up the process of feature extraction.</p>
+<h2 id="Weak-Classifier"><a href="#Weak-Classifier" class="headerlink" title="Weak Classifier"></a>Weak Classifier</h2><p>Let $\mathbf{x}$ be a feature vector for a local patch, and $y$ be its corresponding label, we apply <code>logistic regression</code> to train a weak classifier:<br>$$p(y = \pm 1 | \mathbf{x, w}) = \frac{1}{1 + \text{exp}(-y \mathbf{w} ^T \mathbf{x})}$$</p>
+<p>Given training samples $\{\mathbf{x}_i, y_i\}_{i=1}^{N}$, we :ay get the parameters $\mathbf{w}$ by minimizing the following energy function:<br>$$E = \sum_{i=1}^{N} \text{log}(1 + \text{exp}(-y \mathbf{w} ^T \mathbf{x})) + \lambda \mathbf{w}^T \mathbf{w}$$<br>where $\lambda$ is a regularization term.</p>
+<p>To optimize this energy function, we may make use of <code>Iterative Scaling</code>. OpenCV also provides tools to do logistic regression.</p>
+<h2 id="Cascade-Training"><a href="#Cascade-Training" class="headerlink" title="Cascade Training"></a>Cascade Training</h2><h4 id="Note-the-following-1"><a href="#Note-the-following-1" class="headerlink" title="Note the following:"></a>Note the following:</h4><ul>
+<li>For local patches, train weak classifier <code>in parallel</code>, <code>OpenMP</code> is used.</li>
+<li>Add the weak classifier with best performance one by one. Performance is measured using <code>AUC (Area Under ROC Curve)</code>.</li>
+<li>Suppose a window has $K$ local patch, then for each local patch, we train a classifier. </li>
+<li>Bootstrapping: random sampling with <em>replacement</em>.</li>
+<li>Same amount of negative and positive samples when training local classifier: $20\times d$, where $d$ is the dimension of feature vector.</li>
+</ul>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Research/">Research</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/computer-vision/">computer vision</a><a href="/tags/machine-learning/">machine learning</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://soundsilence.github.io/2015/06/03/face-detection-with-surf-cascades/" data-title="Face Detection with SURF Cascades | 醉飲春醪" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/02/21/hello-world/" title="Hello World">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Hello World</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/05/16/programing-clutters-1/"  title="Programing clutters 1">
+ <strong>下一篇：</strong><br/> 
+ <span>Programing clutters 1
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/Leetcode/" title="Leetcode">Leetcode<sup>4</sup></a></li>
+		
+			<li><a href="/categories/Mathematics/" title="Mathematics">Mathematics<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Programming/" title="Programming">Programming<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Research/" title="Research">Research<sup>6</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/code/" title="code">code<sup>4</sup></a></li>
+		
+			<li><a href="/tags/paper/" title="paper">paper<sup>3</sup></a></li>
+		
+			<li><a href="/tags/computer-vision/" title="computer vision">computer vision<sup>2</sup></a></li>
+		
+			<li><a href="/tags/signal-processing/" title="signal processing">signal processing<sup>2</sup></a></li>
+		
+			<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
+		
+			<li><a href="/tags/programming/" title="programming">programming<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Intrinsic-Image/" title="Intrinsic Image">Intrinsic Image<sup>1</sup></a></li>
+		
+			<li><a href="/tags/graphics/" title="graphics">graphics<sup>1</sup></a></li>
+		
+			<li><a href="/tags/research/" title="research">research<sup>1</sup></a></li>
+		
+			<li><a href="/tags/tools/" title="tools">tools<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2017 
+		
+		<a href="http://soundsilence.github.io/about" target="_blank" title="soundsilencebisai">soundsilencebisai</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'httpsoundsilencegithubio';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>
